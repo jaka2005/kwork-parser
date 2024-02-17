@@ -83,7 +83,7 @@ def get_kworks(category: int, page: int = 1) -> Kworks:
         kworks[raw_kwork["id"]] = Kwork(
             title=raw_kwork["name"],
             description=raw_kwork["description"],
-            price=raw_kwork["categoryMinPrice"]
+            price=int(float(raw_kwork["priceLimit"]))
         )
 
     return kworks
@@ -92,5 +92,4 @@ def get_kworks(category: int, page: int = 1) -> Kworks:
 def get_new_kworks(category: int) -> Kworks:
     kworks = get_kworks(category)
     new_ids = DatabaseWorker().add_projetcs(list(kworks.keys()))
-    print(new_ids)
     return {id: kwork for id, kwork in kworks.items() if id in new_ids}
