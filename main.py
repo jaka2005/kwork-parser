@@ -30,18 +30,17 @@ async def send_kowrks(bot: Bot, kworks: Kworks):
         await asyncio.sleep(1/3)
 
 
-async def close_bot(bot: Bot):
-    await bot.session.close()
+bot = Bot(token=TOKEN)
 
 
 def main():
-    bot = Bot(token=TOKEN)
     kworks = get_new_kworks(CATEGORY)
     asyncio.run(send_kowrks(bot, kworks))
-    asyncio.run(close_bot(bot))
 
 
 if __name__ == "__main__":
+    main()
+
     schedule.every(PERIOD).minutes.do(main)
     while True:
         schedule.run_pending()
