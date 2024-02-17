@@ -17,7 +17,7 @@ MESSAGE_TEXT = """
 
 def send_kowrks(bot: TeleBot, kworks: Kworks):
     for id, kwork in kworks.items():
-        await bot.send_message(CHAT_ID, MESSAGE_TEXT.format(
+        bot.send_message(CHAT_ID, MESSAGE_TEXT.format(
             title=kwork.title,
             price=kwork.price,
             description=kwork.description
