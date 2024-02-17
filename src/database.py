@@ -42,7 +42,9 @@ class DatabaseWorker():
         except IntegrityError:
             self._session.rollback()
 
-    def add_projetcs(self, ids: List[int]):
+    def add_projetcs(self, ids: List[int]) -> List[int]:
+        """add new ids and returns ids which not already exists"""
+
         with self._session.begin():
             existed_projects = self._session.query(Projects).filter(
                 Projects.id.in_(ids)
@@ -52,3 +54,5 @@ class DatabaseWorker():
             new_projects = filter(lambda id: id in existed_projects, ids)
 
             self._session.add_all(Projects(id=id) for id in new_projects)
+
+            return new_projects

@@ -1,8 +1,10 @@
 from dataclasses import dataclass
-from typing import Dict, List
+from typing import Dict
 from bs4 import BeautifulSoup
 import requests
 import json
+
+from database import DatabaseWorker
 
 
 BASE_URL = "https://kwork.ru"
@@ -35,7 +37,7 @@ def parse_kwork(id: int) -> Kwork:
     )
 
 
-def get_kworks(page: int, category: int) -> Dict[int, Kwork]:
+def get_kworks(category: int, page: int = 1) -> Dict[int, Kwork]:
     response = requests.get(
         PROJECTS_URL,
         params={"c": category, "page": page}
@@ -72,7 +74,7 @@ def get_kworks(page: int, category: int) -> Dict[int, Kwork]:
 
     data = json.loads(json_data)
 
-    kworks = dict
+    kworks = dict()
     for raw_kwork in data["wantsListData"]["wants"]:
         kworks[raw_kwork["id"]] = Kwork(
             title=raw_kwork["name"],
@@ -80,6 +82,11 @@ def get_kworks(page: int, category: int) -> Dict[int, Kwork]:
             price=raw_kwork["categoryMinPrice"]
         )
 
+    return kworks
 
-def get_new_kworks() -> List[Kwork]:
-    ...
+
+def get_new_kworks(category: int) -> Dict[int, Kwork]:
+    kworks = get_kworks(category)
+    new_ids = DatabaseWorker().add_projetcs(list(kworks.keys()))
+
+    return {id: kwork for id, kwork in kworks.items if id in new_ids}
