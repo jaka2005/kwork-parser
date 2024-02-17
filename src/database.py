@@ -4,8 +4,7 @@ from sqlalchemy import create_engine, Column, Integer
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session
 
-
-DB_CONNECTION_URL = "sqlite:///database.db"
+from config import DB_CONNECTION_URL
 
 
 Base = declarative_base()
