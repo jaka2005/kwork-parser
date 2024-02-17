@@ -2,7 +2,7 @@ import asyncio
 import time
 from aiogram import Bot
 import schedule
-from src.config import CATEGORY, CHAT_ID, TOKEN
+from src.config import CATEGORY, CHAT_ID, PERIOD, TOKEN
 from src.kwork_parser import NEW_OFFER_URL, Kworks, get_new_kworks
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
@@ -42,7 +42,7 @@ def main():
 
 
 if __name__ == "__main__":
-    schedule.every(20).minutes.do(main)
+    schedule.every(PERIOD).minutes.do(main)
     while True:
         schedule.run_pending()
         time.sleep(10/1000)
