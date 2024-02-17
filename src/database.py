@@ -4,7 +4,7 @@ from sqlalchemy import create_engine, Column, Integer
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session
 
-from config import DB_CONNECTION_URL
+from src.config import DB_CONNECTION_URL
 
 
 Base = declarative_base()
@@ -50,9 +50,11 @@ class DatabaseWorker():
                 Projects.id.in_(ids)
             ).all()
 
-            existed_projects = map(lambda prj: prj.id, existed_projects)
-            new_projects = filter(lambda id: id in existed_projects, ids)
+            existed_projects = tuple(map(lambda prj: prj.id, existed_projects))
+            new_projects = tuple(
+                filter(lambda id: id not in existed_projects, ids)
+            )
 
             self._session.add_all(Projects(id=id) for id in new_projects)
 
-            return new_projects
+            return list(new_projects)

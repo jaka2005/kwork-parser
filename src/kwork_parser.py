@@ -4,12 +4,13 @@ from bs4 import BeautifulSoup
 import requests
 import json
 
-from database import DatabaseWorker
+from src.database import DatabaseWorker
 
 
 BASE_URL = "https://kwork.ru"
 PROJECTS_URL = BASE_URL + "/projects"
 KWORK_URL = PROJECTS_URL + "/{id}/view"
+NEW_OFFER_URL = BASE_URL + "/new_offer?project={id}"
 
 
 @dataclass
@@ -17,6 +18,9 @@ class Kwork:
     title: str
     description: str
     price: int
+
+
+Kworks = Dict[int, Kwork]
 
 
 def parse_kwork(id: int) -> Kwork:
@@ -37,7 +41,7 @@ def parse_kwork(id: int) -> Kwork:
     )
 
 
-def get_kworks(category: int, page: int = 1) -> Dict[int, Kwork]:
+def get_kworks(category: int, page: int = 1) -> Kworks:
     response = requests.get(
         PROJECTS_URL,
         params={"c": category, "page": page}
@@ -85,8 +89,8 @@ def get_kworks(category: int, page: int = 1) -> Dict[int, Kwork]:
     return kworks
 
 
-def get_new_kworks(category: int) -> Dict[int, Kwork]:
+def get_new_kworks(category: int) -> Kworks:
     kworks = get_kworks(category)
     new_ids = DatabaseWorker().add_projetcs(list(kworks.keys()))
-
-    return {id: kwork for id, kwork in kworks.items if id in new_ids}
+    print(new_ids)
+    return {id: kwork for id, kwork in kworks.items() if id in new_ids}
