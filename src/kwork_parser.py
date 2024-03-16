@@ -23,6 +23,7 @@ class Kwork:
 Kworks = Dict[int, Kwork]
 
 
+# NOTE: may be useful in the future
 def parse_kwork(id: int) -> Kwork:
     response = requests.get(KWORK_URL.format(id=id))
     response.raise_for_status()

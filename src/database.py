@@ -1,5 +1,6 @@
 from sqlite3 import IntegrityError
-from typing import List, Self
+from typing import List
+from typing_extensions import Self
 from sqlalchemy import create_engine, Column, Integer
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session

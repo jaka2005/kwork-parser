@@ -24,7 +24,7 @@ def send_kowrks(bot: TeleBot, kworks: Kworks):
         ), reply_markup=quick_markup({
             "Откликнуться": {"url": NEW_OFFER_URL.format(id=id)}
         }))
-        time.sleep(1/3)
+        time.sleep(1/2)
 
 
 bot = TeleBot(token=TOKEN)
