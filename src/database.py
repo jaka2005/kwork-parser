@@ -1,5 +1,5 @@
 from sqlite3 import IntegrityError
-from typing import List
+from typing import List, Optional
 
 from sqlalchemy import Column, Integer, create_engine
 from sqlalchemy.ext.declarative import declarative_base
@@ -16,7 +16,7 @@ class Projects(Base):
     id = Column(Integer, primary_key=True, autoincrement=False)
 
 
-def _get_session(connection_url):
+def _get_session(connection_url: str) -> Session:
     engine = create_engine(connection_url)
     session = Session(engine)
     Base.metadata.create_all(engine)
@@ -25,7 +25,7 @@ def _get_session(connection_url):
 
 
 class DatabaseWorker:
-    _INSTANCE: Self = None
+    _INSTANCE: Optional[Self] = None
 
     def __new__(cls) -> Self:
         if cls._INSTANCE:

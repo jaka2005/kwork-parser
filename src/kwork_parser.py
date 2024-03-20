@@ -1,6 +1,6 @@
 import json
 from dataclasses import dataclass
-from typing import Dict
+from typing import Dict, TypeAlias
 
 import requests
 from bs4 import BeautifulSoup
@@ -20,7 +20,7 @@ class Kwork:
     price: int
 
 
-Kworks = Dict[int, Kwork]
+Kworks: TypeAlias = Dict[int, Kwork]
 
 
 # NOTE: may be useful in the future
