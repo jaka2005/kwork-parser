@@ -1,12 +1,12 @@
 from sqlite3 import IntegrityError
 from typing import List
-from typing_extensions import Self
-from sqlalchemy import create_engine, Column, Integer
+
+from sqlalchemy import Column, Integer, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session
+from typing_extensions import Self
 
 from src.config import DB_CONNECTION_URL
-
 
 Base = declarative_base()
 
@@ -24,7 +24,7 @@ def _get_session(connection_url):
     return session
 
 
-class DatabaseWorker():
+class DatabaseWorker:
     _INSTANCE: Self = None
 
     def __new__(cls) -> Self:
@@ -43,18 +43,16 @@ class DatabaseWorker():
         except IntegrityError:
             self._session.rollback()
 
-    def add_projetcs(self, ids: List[int]) -> List[int]:
+    def add_projects(self, ids: List[int]) -> List[int]:
         """add new ids and returns ids which not already exists"""
 
         with self._session.begin():
-            existed_projects = self._session.query(Projects).filter(
-                Projects.id.in_(ids)
-            ).all()
+            existed_projects = (
+                self._session.query(Projects).filter(Projects.id.in_(ids)).all()
+            )
 
             existed_projects = tuple(map(lambda prj: prj.id, existed_projects))
-            new_projects = tuple(
-                filter(lambda id: id not in existed_projects, ids)
-            )
+            new_projects = tuple(filter(lambda id: id not in existed_projects, ids))
 
             self._session.add_all(Projects(id=id) for id in new_projects)
 
