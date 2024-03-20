@@ -1,9 +1,9 @@
 from sqlite3 import IntegrityError
 from typing import List, Optional
 
-from sqlalchemy import Column, Integer, create_engine
+from sqlalchemy import Integer, create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Mapped, Session, mapped_column
 from typing_extensions import Self
 
 from src.config import get_config
@@ -13,7 +13,8 @@ Base = declarative_base()
 
 class Projects(Base):
     __tablename__ = "projects"
-    id = Column(Integer, primary_key=True, autoincrement=False)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=False)
 
 
 def _get_session(connection_url: str) -> Session:
