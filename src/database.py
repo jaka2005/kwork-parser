@@ -52,8 +52,8 @@ class DatabaseWorker:
             )
 
             existed_projects = tuple(map(lambda prj: prj.id, existed_projects))
-            new_projects = tuple(filter(lambda id: id not in existed_projects, ids))
+            new_projects = list(filter(lambda id: id not in existed_projects, ids))
 
             self._session.add_all(Projects(id=id) for id in new_projects)
 
-            return list(new_projects)
+            return new_projects
