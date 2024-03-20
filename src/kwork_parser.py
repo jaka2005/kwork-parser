@@ -5,12 +5,8 @@ from typing import Dict, TypeAlias
 import requests
 from bs4 import BeautifulSoup
 
+from config import KWORK_URL, PROJECTS_URL
 from src.database import DatabaseWorker
-
-BASE_URL = "https://kwork.ru"
-PROJECTS_URL = BASE_URL + "/projects"
-KWORK_URL = PROJECTS_URL + "/{id}/view"
-NEW_OFFER_URL = BASE_URL + "/new_offer?project={id}"
 
 
 @dataclass
@@ -31,6 +27,9 @@ def parse_kwork(id: int) -> Kwork:
     soup = BeautifulSoup(response.text, "lxml")
     script_soup: BeautifulSoup = soup.find_all("script", type="application/ld+json")[-1]
 
+    if not script_soup.string:
+        raise Exception
+
     data = json.loads(script_soup.string.replace("\n", "\\r\\n"))
 
     return Kwork(
@@ -46,15 +45,18 @@ def get_kworks(category: int, page: int = 1) -> Kworks:
 
     soup = BeautifulSoup(response.text, "lxml")
 
+    if not soup.head:
+        raise Exception
+
     scripts = soup.head.find_all("script")
-    js_script = None
+    js_script = ""
     for script in scripts:
         if script.text.startswith("window.ORIGIN_URL"):
             js_script = script.text
             break
 
     start_pointer = 0
-    json_data = None
+    json_data = ""
     in_literal = False
     for current_pointer in range(len(js_script)):
         if js_script[current_pointer] == '"' and js_script[current_pointer - 1] != "\\":
@@ -73,7 +75,7 @@ def get_kworks(category: int, page: int = 1) -> Kworks:
 
     data = json.loads(json_data)
 
-    kworks = dict()
+    kworks: Kworks = dict()
     for raw_kwork in data["wantsListData"]["wants"]:
         kworks[raw_kwork["id"]] = Kwork(
             title=raw_kwork["name"],

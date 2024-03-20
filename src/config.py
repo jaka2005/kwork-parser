@@ -19,3 +19,19 @@ class Config(BaseSettings):
 @lru_cache()
 def get_config() -> Config:
     return Config()
+
+
+MESSAGE_TEXT = """
+{title}
+Желаемый бюджет: {price} Рублей
+
+{description}
+"""
+
+# Time between sending next kwork if there is more than 1
+SEND_KWORK_TIMEOUT = 1 / 2
+
+BASE_URL = "https://kwork.ru"
+PROJECTS_URL = BASE_URL + "/projects"
+KWORK_URL = PROJECTS_URL + "/{id}/view"
+NEW_OFFER_URL = BASE_URL + "/new_offer?project={id}"
