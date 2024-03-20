@@ -6,7 +6,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session
 from typing_extensions import Self
 
-from src.config import DB_CONNECTION_URL
+from src.config import get_config
 
 Base = declarative_base()
 
@@ -34,7 +34,7 @@ class DatabaseWorker:
             return super().__new__(cls)
 
     def __init__(self) -> None:
-        self._session = _get_session(DB_CONNECTION_URL)
+        self._session = _get_session(get_config().db_connection_url)
 
     def add_project(self, id: int):
         try:
