@@ -1,22 +1,23 @@
 from sqlite3 import IntegrityError
-from typing import List
-from typing_extensions import Self
-from sqlalchemy import create_engine, Column, Integer
+from typing import List, Optional
+
+from sqlalchemy import Integer, create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Mapped, Session, mapped_column
+from typing_extensions import Self
 
-from src.config import DB_CONNECTION_URL
-
+from src.config import get_config
 
 Base = declarative_base()
 
 
 class Projects(Base):
     __tablename__ = "projects"
-    id = Column(Integer, primary_key=True, autoincrement=False)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=False)
 
 
-def _get_session(connection_url):
+def _get_session(connection_url: str) -> Session:
     engine = create_engine(connection_url)
     session = Session(engine)
     Base.metadata.create_all(engine)
@@ -24,8 +25,8 @@ def _get_session(connection_url):
     return session
 
 
-class DatabaseWorker():
-    _INSTANCE: Self = None
+class DatabaseWorker:
+    _INSTANCE: Optional[Self] = None
 
     def __new__(cls) -> Self:
         if cls._INSTANCE:
@@ -34,7 +35,7 @@ class DatabaseWorker():
             return super().__new__(cls)
 
     def __init__(self) -> None:
-        self._session = _get_session(DB_CONNECTION_URL)
+        self._session = _get_session(get_config().db_connection_url)
 
     def add_project(self, id: int):
         try:
@@ -43,19 +44,17 @@ class DatabaseWorker():
         except IntegrityError:
             self._session.rollback()
 
-    def add_projetcs(self, ids: List[int]) -> List[int]:
+    def add_projects(self, ids: List[int]) -> List[int]:
         """add new ids and returns ids which not already exists"""
 
         with self._session.begin():
-            existed_projects = self._session.query(Projects).filter(
-                Projects.id.in_(ids)
-            ).all()
+            existed_projects = (
+                self._session.query(Projects).filter(Projects.id.in_(ids)).all()
+            )
 
             existed_projects = tuple(map(lambda prj: prj.id, existed_projects))
-            new_projects = tuple(
-                filter(lambda id: id not in existed_projects, ids)
-            )
+            new_projects = list(filter(lambda id: id not in existed_projects, ids))
 
             self._session.add_all(Projects(id=id) for id in new_projects)
 
-            return list(new_projects)
+            return new_projects
